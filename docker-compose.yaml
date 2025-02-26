@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    volumes:
+      - ./StripeShop:/shop
+    ports:
+      - "8000:8000"
+    working_dir: /shop
+    command: python manage.py runserver 0.0.0.0:8000

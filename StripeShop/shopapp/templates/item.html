@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о товаре {{ item.name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'item.css' %}">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <div class="product-container">
+        <h1 class="product-name">{{ item.name }}</h1>
+        <p class="product-description">{{ item.description }}</p>
+        <p class="product-price">Цена: {{ item.price }} руб.</p>
+        <form>
+            {% csrf_token %}
+            <button id="buy-button">Купить</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById("buy-button").addEventListener("click", async function (event) {
+            event.preventDefault();
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const response = await fetch("/shopapp/buy/{{ item.id }}/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
+                body: JSON.stringify({})
+            });
+            const data = await response.json();
+            Stripe("{{ STRIPE_PUBLIC_KEY }}").redirectToCheckout({ sessionId: data.session_id });
+        });
+    </script>
+</body>
+</html>
